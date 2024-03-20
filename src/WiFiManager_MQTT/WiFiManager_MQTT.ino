@@ -174,6 +174,7 @@ void reconnect() {
     lastReconnectAttempt = millis();
     checkButton();
     Serial.print("Attempting MQTT connection...");
+    client.setServer(mqtt_server, mqttPortInt);
     if (client.connect("ESP8266Client", mqtt_user, mqtt_pass)) {
       Serial.println("connected");
     } else {
