@@ -5,6 +5,9 @@
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
 
 
 #define TRIGGER_PIN 0
