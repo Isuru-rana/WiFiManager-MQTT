@@ -15,7 +15,6 @@ bool shouldSaveConfig = false;
 #define mqtt_port "1883"
 #define mqtt_user "mqtt Username"
 #define mqtt_pass "mqtt Password"
-#define humidity_topic "sensor/humidity"
 
 int mqttPortInt = 1883;
 
@@ -74,17 +73,21 @@ void setup() {
   wifiManager.addParameter(&custom_mqtt_user);
   wifiManager.addParameter(&custom_mqtt_pass);
 
-  Serial.print("Custom MQTT Username: ");
-  Serial.println(custom_mqtt_user.getValue());
 
-  if (!wifiManager.autoConnect("AutoConnectAP", "password")) {
+  wifiManager.setConnectTimeout(20);
+  wifiManager.setConfigPortalTimeout(30);
+  wifiManager.setAPClientCheck(true);
+  wifiManager.setHostname("Your device name"); // Enter your device name here
+
+  bool res = wifiManager.autoConnect("GreenHouse AP","Isuru234"); 
+  if(!res) {
     Serial.println("failed to connect and hit timeout");
-    delay(3000);
     ESP.reset();
-    delay(5000);
   }
-
+ else{
   Serial.println("connected...yeey :)");
+ }
+
   strcpy(mqtt_server, custom_mqtt_server.getValue());
   strcpy(mqtt_port, custom_mqtt_port.getValue());
   strcpy(mqtt_user, custom_mqtt_user.getValue());
@@ -155,6 +158,8 @@ void checkButton() {
   }
 }
 
+void MQTTsubscribe();
+
 unsigned long lastReconnectAttempt = 0;
 
 
@@ -175,8 +180,10 @@ void reconnect() {
     checkButton();
     Serial.print("Attempting MQTT connection...");
     client.setServer(mqtt_server, mqttPortInt);
+    client.setCallback(callBack);
     if (client.connect("ESP8266Client", mqtt_user, mqtt_pass)) {
       Serial.println("connected");
+      MQTTsubscribe();
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -195,10 +202,6 @@ bool checkBound(float newValue, float prevValue, float maxDiff) {
   return !isnan(newValue) && (newValue < prevValue - maxDiff || newValue > prevValue + maxDiff);
 }
 
-long lastMsg = 0;
-float temp = 0.0;
-float hum = 0.0;
-float diff = 1.0;
 
 void loop() {
   checkButton();
@@ -206,20 +209,5 @@ void loop() {
     reconnect();
   }
   client.loop();
-
-  long now = millis();
-  if (now - lastMsg > 1000) {
-    lastMsg = now;
-
-    float newTemp = 10;
-    float newHum = 20;
-
-    if (checkBound(newHum, hum, diff)) {
-      hum = newHum;
-      Serial.print("New humidity:");
-      Serial.println(String(hum).c_str());
-      client.publish(humidity_topic, String(hum).c_str(), true);
-    }
-  }
   // Include the repetitive program here
 }
