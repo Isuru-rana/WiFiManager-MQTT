@@ -4,7 +4,7 @@ void MQTTsubscribe() {
   */
 }
 
-void callBack() {
+void callBack(char* topic, byte* payload, unsigned int length) {
 /*
     Received data from MQTT will be processed here.
     Template for JSON strings:
@@ -16,6 +16,7 @@ void callBack() {
       "device": "ESP8266",
       "State": 1
     }
+    */
 
   // This line indicates the receipt of a message. (Topic should be subscribed.)
   Serial.println("Message arrived in topic: " + String(topic));
@@ -52,6 +53,4 @@ void callBack() {
       //Do something if state is equals to 1 (check the example payload on line 11 in mqtt.ino)
     }
   }
-
-  */
 }
