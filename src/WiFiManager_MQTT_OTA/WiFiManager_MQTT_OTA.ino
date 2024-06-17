@@ -117,7 +117,7 @@ void setup() {
     configFile.close();
   }
   ArduinoOTA.setHostname("Your OTA Host name");
-  ArduinoOTA.setPassword("password");
+  ArduinoOTA.setPassword("password for OTA");
   ArduinoOTA.onStart([]() {
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH)
